@@ -1,0 +1,9 @@
+{% extends "_layouts/cp" %}
+{% set centered = true %}
+
+{% set title = "Bulk Actions" %}
+
+{% set tabs = {
+delete: { label: "Delete"|t, url: url('bulkactions/delete') },
+misc: { label: "Misc"|t, url: url('bulkactions/misc') }
+} %}

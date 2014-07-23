@@ -1,0 +1,48 @@
+{% extends "bulkactions/_layouts/base" %}
+{% import "_includes/forms" as forms %}
+
+{% set selectedTab = 'misc' %}
+
+{% set doSelected = (doSelected is defined ? doSelected : '') %}
+{% set sectionsSelected = (sectionsSelected is defined ? sectionsSelected : []) %}
+
+{% block content %}
+
+    <form method="post" action="" accept-charset="UTF-8">
+        <input type="hidden" name="action" value="bulkActions/misc">
+
+        {{ forms.selectField({
+        label: "What action do you want to perform?"|t,
+        instructions: "Select which action you want to do."|t,
+        id: 'do',
+        name: 'do',
+        options: [
+        {label: "Choose"|t, value: ''},
+        {label: "Re-save"|t, value: 'save'}
+        ],
+        value: doSelected,
+        required: true
+        }) }}
+
+        {% set sectionList = [] %}
+        {% for section in craft.sections.getAllSections() %}
+            {% set totalEntries = craft.entries.total({'section': section, 'status': null}) %}
+            {% set sectionList = sectionList|merge([{label: section.name|t ~ ' ('~totalEntries~')', value: section.id }]) %}
+        {% endfor %}
+
+        {{ forms.checkboxSelectField({
+        label: "In which section?"|t,
+        instructions: "Select in which section should we perform the change."|t,
+        id: 'sections',
+        name: 'sections',
+        options: sectionList,
+        values: sectionsSelected,
+        required: true
+        })}}
+
+        <div class="buttons">
+            <input type="submit" class="btn submit formsubmit" value="{{ 'Submit'|t }}">
+        </div>
+    </form>
+{% endblock %}
+

@@ -1,0 +1,50 @@
+{% extends "bulkactions/_layouts/base" %}
+{% import "_includes/forms" as forms %}
+
+{% set selectedTab = 'delete' %}
+
+{% set statusSelected = (statusSelected is defined ? statusSelected : []) %}
+{% set sectionsSelected = (sectionsSelected is defined ? sectionsSelected : []) %}
+
+{% block content %}
+
+    <form method="post" action="" accept-charset="UTF-8">
+        <input type="hidden" name="action" value="bulkActions/delete">
+        {#<input type="hidden" name="redirect" value="settings/sections">#}
+        {{ forms.checkboxSelectField({
+        label: "What do you want to remove?"|t,
+        instructions: "Select which type of entry you want to remove."|t,
+        id: 'status',
+        name: 'status',
+        options: [
+        {label: "All Live entries"|t, value: 'live'},
+        {label: "All Pending entries"|t, value: 'pending'},
+        {label: "All Expired entries"|t, value: 'expired'},
+        {label: "All Disabled entries"|t, value: 'disabled'}
+        ],
+        values: statusSelected,
+        required: true
+        })}}
+
+        {% set sectionList = [] %}
+        {% for section in craft.sections.getAllSections() %}
+            {% set totalEntries = craft.entries.total({'section': section, 'status': null}) %}
+            {% set sectionList = sectionList|merge([{label: section.name|t ~ ' ('~totalEntries~')', value: section.id }]) %}
+        {% endfor %}
+
+        {{ forms.checkboxSelectField({
+        label: "In which section?"|t,
+        instructions: "Select in which section should we perform the change."|t,
+        id: 'sections',
+        name: 'sections',
+        options: sectionList,
+        values: sectionsSelected,
+        required: true
+        })}}
+
+        <div class="buttons">
+            <input type="submit" class="btn submit formsubmit" value="{{ 'Submit'|t }}" data-confirm="{{ 'Are you sure you want to delete these entries?'|t }}">
+        </div>
+    </form>
+{% endblock %}
+
